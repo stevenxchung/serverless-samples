@@ -1,5 +1,6 @@
 import logging
 import requests
+from sqlalchemy import func
 from weather.models import Weather
 from weather.database import db
 
@@ -27,8 +28,8 @@ class WeatherService:
             WeatherService.logger.error("No geolocation data found.")
             return None
 
-        weather_from_db = Weather.query.filter_by(
-            city=geo_data[0]["name"]
+        weather_from_db = Weather.query.filter(
+            func.lower(Weather.city) == geo_data[0]["name"].lower()
         ).first()
         if weather_from_db:
             WeatherService.logger.info(
@@ -71,11 +72,15 @@ class WeatherService:
 
     @staticmethod
     def get_by_name(city_name):
-        return Weather.query.filter_by(city=city_name).first()
+        return Weather.query.filter(
+            func.lower(Weather.city) == city_name.lower()
+        ).first()
 
     @staticmethod
     def update(city_name, update_data):
-        weather = Weather.query.filter_by(city=city_name).first()
+        weather = Weather.query.filter(
+            func.lower(Weather.city) == city_name.lower()
+        ).first()
         if weather:
             for key, value in update_data.items():
                 setattr(weather, key, value)
@@ -85,7 +90,9 @@ class WeatherService:
 
     @staticmethod
     def delete(city_name):
-        weather = Weather.query.filter_by(city=city_name).first()
+        weather = Weather.query.filter(
+            func.lower(Weather.city) == city_name.lower()
+        ).first()
         if weather:
             db.session.delete(weather)
             db.session.commit()
