@@ -1,7 +1,10 @@
+import logging
 import graphene
 from graphene_sqlalchemy import SQLAlchemyObjectType
 from weather.models import Weather as WeatherModel
 from weather.weather_service import WeatherService
+
+logger = logging.getLogger(__name__)
 
 
 class WeatherType(SQLAlchemyObjectType):
@@ -14,9 +17,14 @@ class Query(graphene.ObjectType):
     weather_by_name = graphene.Field(WeatherType, city=graphene.String())
 
     def resolve_weathers(self, info):
+        field_name = info.field_name
+        parent_type = info.parent_type.name
+        logger.info(f"Resolving field {field_name} on type {parent_type}")
+
         return WeatherService.get_all()
 
     def resolve_weather_by_name(self, info, city):
+        logger.debug(f"Resolving weather for city: {city}")
         return WeatherService.get_by_name(city)
 
 
@@ -27,6 +35,9 @@ class FetchAndSaveWeather(graphene.Mutation):
     weather = graphene.Field(lambda: WeatherType)
 
     def mutate(self, info, location_name):
+        logger.info(
+            f"Fetching and saving weather data for location: {location_name}"
+        )
         weather = WeatherService.fetch_and_save_weather_data(location_name)
         return FetchAndSaveWeather(weather=weather) if weather else None
 
@@ -54,6 +65,7 @@ class UpdateWeather(graphene.Mutation):
         population=None,
         description=None,
     ):
+        logger.info(f"Updating weather data for city: {city}")
         update_data = {
             "city": city,
             "lat_long": lat_long,
@@ -75,6 +87,7 @@ class DeleteWeather(graphene.Mutation):
     ok = graphene.Boolean()
 
     def mutate(self, info, city):
+        logger.info(f"Deleting weather data for city: {city}")
         success = WeatherService.delete(city)
         return DeleteWeather(ok=success)
 
