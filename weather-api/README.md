@@ -18,8 +18,6 @@ A simple Flask API using GraphQL to perform CRUD operations on weather data with
 2. **Create and activate a virtual environment:**
 
    ```bash
-   # Only if /venv folder does not exist
-   python -m venv venv
    # Install dependencies to virtual environment
    pipenv install
    # Activate virtual environment
