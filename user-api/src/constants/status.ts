@@ -1,0 +1,7 @@
+export const ResponseStatus = {
+  CREATED: "CREATED",
+  UPDATED: "UPDATED",
+  NO_CHANGE: "NO_CHANGE",
+  UNIQUE_CONSTRAINT_FAILED: "UNIQUE_CONSTRAINT_FAILED",
+  ERROR: "ERROR",
+} as const;
