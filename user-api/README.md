@@ -21,6 +21,15 @@ BASE_URL=
 PORT=
 ```
 
+Alternatively, if using [bun](https://bun.sh/) (recommended), replace `npm` with `bun`. The versions we recommend are:
+
+```
+  "engines": {
+    "node": "22.x",
+    "bun": "1.2.x"
+  }
+```
+
 ## Running the Application
 
 The command below will start the server http://localhost:3000 or a configured `<BASE_URL>:<PORT>` as mentioned previously.
