@@ -15,13 +15,11 @@ A simple Flask API using GraphQL to perform CRUD operations on weather data with
    cd weather-api
    ```
 
-2. **Create and activate a virtual environment:**
+2. **Install dependencies via [uv](https://docs.astral.sh/uv/getting-started/installation/):**
 
    ```bash
-   # Install dependencies to virtual environment
-   pipenv install
-   # Activate virtual environment
-   pipenv shell
+   # Install dependencies
+   uv sync
    ```
 
 3. **Initialize the database:**
@@ -40,7 +38,7 @@ A simple Flask API using GraphQL to perform CRUD operations on weather data with
 1. **Start the Flask server:**
 
    ```bash
-   python app.py
+   uv run app.py
    ```
 
 2. **Access the GraphQL interface:**
