@@ -1,7 +1,7 @@
 import express from "express";
 import { CreateUserResponse, UpdateUserResponse } from "types/response";
-import { ResponseStatus } from "@constants/status";
-import { UserService } from "@services/user.service";
+import { ResponseStatus } from "src/status";
+import { UserService } from "src/user.service";
 
 const router = express.Router();
 const userService = new UserService();

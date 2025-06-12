@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import db from "@db/config";
+import db from "src/config";
 
 const generateRandomUser = () => ({
   firstName: faker.person.firstName(),

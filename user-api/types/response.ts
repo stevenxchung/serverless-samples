@@ -1,5 +1,5 @@
-import { ResponseStatus } from "@constants/status";
-import { User } from "@models/user";
+import { ResponseStatus } from "src/status";
+import { User } from "src/user";
 
 export type ErrorResponse =
   | { status: typeof ResponseStatus.NO_CHANGE }

@@ -1,7 +1,7 @@
-import db from "@db/config";
+import db from "src/config";
 import { CreateUserResponse, UpdateUserResponse } from "types/response";
-import { User } from "@models/user";
-import { UserRepository } from "@repository/user.repository";
+import { User } from "src/user";
+import { UserRepository } from "src/user.repository";
 
 export class UserService {
   private userRepo = new UserRepository(db);

@@ -1,7 +1,7 @@
 import { Database } from "better-sqlite3";
 import { CreateUserResponse, UpdateUserResponse } from "types/response";
-import { ResponseStatus } from "@constants/status";
-import { User } from "@models/user";
+import { ResponseStatus } from "src/status";
+import { User } from "src/user";
 
 const toUser = (row: any): User | undefined => {
   return row ? { ...row, isActive: Boolean(row.isActive) } : undefined;

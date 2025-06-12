@@ -1,4 +1,4 @@
-import db from "@db/config";
+import db from "src/config";
 
 const dropUsersTable = () => {
   const stmt = db.prepare("DROP TABLE IF EXISTS users");
