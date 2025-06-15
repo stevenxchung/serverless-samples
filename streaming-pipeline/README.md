@@ -53,9 +53,12 @@ This setup is ideal for learning, prototyping, or testing event-driven architect
    ```
 
 3. **Check latest consumer logs:**
+
    ```sh
    make logs
    ```
+
+**Note:** it could take a few seconds for the consumer to join the consumer group.
 
 ### Stopping and Cleaning Up
 
