@@ -45,6 +45,7 @@ services:
     depends_on:
       - init-kafka-topic
     environment:
+      - MAX_BATCH_SIZE=10000
       - KAFKA_BROKER=kafka:9092
       - KAFKA_TOPIC=demo-topic
       - CLIENT_ID=demo-producer

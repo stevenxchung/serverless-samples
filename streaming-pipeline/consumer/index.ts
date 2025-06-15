@@ -1,12 +1,6 @@
-import { Kafka, type KafkaMessage } from "kafkajs";
-import pino from "pino";
+import { Kafka } from "kafkajs";
 
-const logger = pino({
-  transport: {
-    target: "pino-pretty",
-    options: { colorize: true },
-  },
-});
+import { handleLogging, timeExecution } from "./utils";
 
 const clientId = process.env.CLIENT_ID || "demo-consumer";
 const brokers = [process.env.KAFKA_BROKER || "localhost:9092"];
@@ -34,14 +28,21 @@ async function _waitForTopic() {
   throw new Error(`Timeout waiting for topic "${topic}"`);
 }
 
-function _handleLogging(message: KafkaMessage, partition: number) {
-  const value = message.value?.toString() || "";
-  if (!/\d/.test(value) || Number(message.offset) % 100 === 0) {
-    // Log non-bulk messages or log every 100th message
-    logger.info(
-      `Processed and committed offset: ${message.offset} (topic: ${topic}, partition: ${partition})`
-    );
+async function processBatch(
+  batch: any,
+  resolveOffset: (offset: string) => void,
+  commitOffsetsIfNecessary: () => Promise<void>,
+  heartbeat: () => Promise<void>
+) {
+  for (const message of batch.messages) {
+    // Process the message (warning: ensure this is idempotent via IDs, caching, etc.)
+    resolveOffset(message.offset); // Mark as processed
   }
+
+  const lastMessage = batch.messages.at(-1)!;
+  handleLogging(lastMessage, batch);
+  await commitOffsetsIfNecessary(); // Commit offsets for the batch
+  await heartbeat();
 }
 
 async function run() {
@@ -50,16 +51,16 @@ async function run() {
   await consumer.subscribe({ topic, fromBeginning: false });
 
   await consumer.run({
-    eachMessage: async ({ topic, partition, message }) => {
-      // Commit the offset after successful processing
-      await consumer.commitOffsets([
-        {
-          topic,
-          partition,
-          offset: (Number(message.offset) + 1).toString(), // Increment to `offset + 1` since message at `offset` was processed
-        },
-      ]);
-      _handleLogging(message, partition);
+    eachBatch: async ({
+      batch,
+      resolveOffset,
+      heartbeat,
+      commitOffsetsIfNecessary,
+    }) => {
+      await timeExecution(() =>
+        // Batch messages for more efficient processing and higher throughput
+        processBatch(batch, resolveOffset, commitOffsetsIfNecessary, heartbeat)
+      )();
     },
   });
 }

@@ -12,10 +12,10 @@ const clientId = process.env.CLIENT_ID || "demo-producer";
 const brokers = [process.env.KAFKA_BROKER || "localhost:9092"];
 const topic = process.env.KAFKA_TOPIC || "demo-topic";
 const port = Number(process.env.PORT) || 3000;
+const batchSize = Number(process.env.MAX_BATCH_SIZE) || 10000;
 
 const kafka = new Kafka({ clientId, brokers });
 const producer = kafka.producer({
-  maxInFlightRequests: 10,
   idempotent: false,
   allowAutoTopicCreation: false,
 });
@@ -31,10 +31,10 @@ function jsonResponse(data: unknown, status = 200) {
   });
 }
 
-async function handleSend(req: Request) {
+async function _handleSend(req: Request) {
   let body: SendMessageBody;
   try {
-    body = await req.json();
+    body = (await req.json()) as SendMessageBody;
   } catch {
     return jsonResponse({ error: "Invalid JSON" }, 400);
   }
@@ -56,10 +56,28 @@ async function handleSend(req: Request) {
   }
 }
 
-async function sendBulk(req: Request, n: number) {
-  if (isNaN(n) || n < 1) {
+async function _handleSendBulk(desiredMessages: number) {
+  if (isNaN(desiredMessages) || desiredMessages < 1) {
     return jsonResponse({ error: "Invalid number of messages" }, 400);
   }
+
+  let remaining = desiredMessages;
+  let latestResult;
+  while (remaining > 0) {
+    // Batch messages for more efficient processing and higher throughput
+    const currentBatch = Math.min(batchSize, remaining);
+    const result = await _sendBulk(currentBatch);
+    latestResult = await result.json();
+    remaining -= currentBatch;
+  }
+
+  return jsonResponse({
+    total: desiredMessages,
+    latestResult: latestResult,
+  });
+}
+
+async function _sendBulk(n: number) {
   const messages = [];
   for (let i = 0; i < n; i++) {
     messages.push({ value: `Message No. ${i + 1}` });
@@ -86,13 +104,13 @@ Bun.serve({
     const url = new URL(req.url);
     // POST /send
     if (req.method === "POST" && url.pathname === "/send") {
-      return handleSend(req);
+      return _handleSend(req);
     }
     // POST /bulk/:n
     const bulkMatch = url.pathname.match(/^\/bulk\/(\d+)$/);
-    if (req.method === "POST" && bulkMatch) {
+    if (req.method === "POST" && bulkMatch && bulkMatch[1]) {
       const n = parseInt(bulkMatch[1], 10);
-      return sendBulk(req, n);
+      return _handleSendBulk(n);
     }
     return new Response("Not Found", { status: 404 });
   },
