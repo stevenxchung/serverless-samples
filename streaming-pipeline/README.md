@@ -18,7 +18,7 @@ This setup is ideal for learning, prototyping, or testing event-driven architect
 [REST Client] ---> [Producer API] ---> [Kafka Topic] ---> [Consumer]
 ```
 
-- The **Producer** exposes a REST endpoint (`/send`) to accept messages and publish them to Kafka.
+- The **Producer** exposes REST endpoints (`/message` and `/message/bulk/:n`) to accept messages and publish them to Kafka.
 - The **Consumer** subscribes to the Kafka topic, processes each message, and commits the offset to prevent reprocessing.
 - Kafka ensures reliable delivery and decoupling between producer and consumer.
 
