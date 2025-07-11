@@ -102,12 +102,12 @@ Bun.serve({
   port,
   async fetch(req) {
     const url = new URL(req.url);
-    // POST /send
-    if (req.method === "POST" && url.pathname === "/send") {
+    // POST /message
+    if (req.method === "POST" && url.pathname === "/message") {
       return _handleSend(req);
     }
-    // POST /bulk/:n
-    const bulkMatch = url.pathname.match(/^\/bulk\/(\d+)$/);
+    // POST /message/bulk/:n
+    const bulkMatch = url.pathname.match(/^\/message\/bulk\/(\d+)$/);
     if (req.method === "POST" && bulkMatch && bulkMatch[1]) {
       const n = parseInt(bulkMatch[1], 10);
       return _handleSendBulk(n);

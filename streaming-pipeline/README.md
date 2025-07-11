@@ -49,10 +49,17 @@ This setup is ideal for learning, prototyping, or testing event-driven architect
 2. **Send a message to the producer:**
 
    ```sh
-   curl -X POST http://localhost:3000/send -H "Content-Type: application/json" -d "{\"message\":\"Hello Kafka!\"}"
+   curl -X POST http://localhost:3000/message -H "Content-Type: application/json" -d "{\"message\":\"Hello Kafka!\"}"
    ```
 
-3. **Check latest consumer logs:**
+3. **(Optional) send N messages to the producer:**
+
+   ```sh
+   # Where n = 10000 messages
+   curl -X POST http://localhost:3000/message/bulk/10000 -H "Content-Type: application/json" -d "{\"message\":\"Bulk Message!\"}"
+   ```
+
+4. **Check latest consumer logs:**
 
    ```sh
    make logs
