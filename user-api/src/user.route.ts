@@ -28,12 +28,6 @@ const userResOutcomes = (
   }
 };
 
-router.get("/users", (req, res) => {
-  const limit = Number(req.query.limit as string);
-  const users = userService.getUsers(limit);
-  return res.json(users);
-});
-
 router.get("/:id", (req, res) => {
   const user = userService.getUserById(req.params.id);
   if (!user) return res.status(404).json({ error: "User not found" });

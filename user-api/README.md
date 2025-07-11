@@ -40,10 +40,10 @@ npm run dev
 
 ## Example REST Calls
 
-1. **GET `/user/users`:** Get N users (defaults to 10)
+1. **GET `/users`:** Get N users (defaults to 10)
 
    ```bash
-   curl --location 'http://localhost:3000/user/users?limit=5'
+   curl --location 'http://localhost:3000/users?limit=5'
    ```
 
 2. **GET `/user/:id`:** Fetches a user by their unique ID
