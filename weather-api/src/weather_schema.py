@@ -1,101 +1,81 @@
 import logging
-import graphene
-from graphene_sqlalchemy import SQLAlchemyObjectType
-from weather.models import Weather as WeatherModel
-from weather.weather_service import WeatherService
+import strawberry
+from typing import List, Optional
+from src.weather_service import WeatherService
 
 logger = logging.getLogger(__name__)
 
 
-class WeatherType(SQLAlchemyObjectType):
-    class Meta:
-        model = WeatherModel
+@strawberry.type
+class WeatherType:
+    id: Optional[int]
+    city: Optional[str]
+    lat_long: Optional[str]
+    timestamp: Optional[str]
+    average_temp: Optional[float]
+    elevation: Optional[float]
+    population: Optional[int]
+    description: Optional[str]
 
 
-class Query(graphene.ObjectType):
-    weathers = graphene.List(WeatherType)
-    weather_by_name = graphene.Field(WeatherType, city=graphene.String())
+@strawberry.type
+class Query:
+    @strawberry.field
+    def weather_list(self, info: strawberry.Info) -> List[WeatherType]:
+        session = info.context["session"]
+        ws = WeatherService(session)
 
-    def resolve_weathers(self, info):
-        field_name = info.field_name
-        parent_type = info.parent_type.name
-        logger.info(f"Resolving field {field_name} on type {parent_type}")
+        return ws.get_all()
 
-        return WeatherService.get_all()
+    @strawberry.field
+    def weather_by_name(
+        self, info: strawberry.Info, city: str
+    ) -> Optional[WeatherType]:
+        session = info.context["session"]
+        ws = WeatherService(session)
 
-    def resolve_weather_by_name(self, info, city):
         logger.debug(f"Resolving weather for city: {city}")
-        return WeatherService.get_by_name(city)
+        return ws.get_by_name(city)
 
 
-class FetchAndSaveWeather(graphene.Mutation):
-    class Arguments:
-        location_name = graphene.String()
-
-    weather = graphene.Field(lambda: WeatherType)
-
-    def mutate(self, info, location_name):
-        logger.info(
-            f"Fetching and saving weather data for location: {location_name}"
-        )
-        weather = WeatherService.fetch_and_save_weather_data(location_name)
-        return FetchAndSaveWeather(weather=weather) if weather else None
+@strawberry.input
+class WeatherUpdateInput:
+    lat_long: Optional[str] = None
+    timestamp: Optional[str] = None
+    average_temp: Optional[float] = None
+    elevation: Optional[float] = None
+    population: Optional[int] = None
+    description: Optional[str] = None
 
 
-class UpdateWeather(graphene.Mutation):
-    class Arguments:
-        city = graphene.String()
-        lat_long = graphene.String()
-        timestamp = graphene.String()
-        average_temp = graphene.Float()
-        elevation = graphene.Float()
-        population = graphene.Int()
-        description = graphene.String()
+@strawberry.type
+class Mutation:
+    @strawberry.mutation
+    def sync_weather(
+        self, info: strawberry.Info, location_name: str
+    ) -> Optional[WeatherType]:
+        session = info.context["session"]
+        ws = WeatherService(session)
 
-    weather = graphene.Field(lambda: WeatherType)
+        logger.info(f"Fetching and saving weather data for location: {location_name}")
+        return ws.fetch_and_save_weather_data(location_name)
 
-    def mutate(
-        self,
-        info,
-        city,
-        lat_long=None,
-        timestamp=None,
-        average_temp=None,
-        elevation=None,
-        population=None,
-        description=None,
-    ):
+    @strawberry.mutation
+    def update_weather(
+        self, info: strawberry.Info, city: str, update: WeatherUpdateInput
+    ) -> Optional[WeatherType]:
+        session = info.context["session"]
+        ws = WeatherService(session)
         logger.info(f"Updating weather data for city: {city}")
-        update_data = {
-            "city": city,
-            "lat_long": lat_long,
-            "timestamp": timestamp,
-            "average_temp": average_temp,
-            "elevation": elevation,
-            "population": population,
-            "description": description,
-        }
-        update_data = {k: v for k, v in update_data.items() if v is not None}
-        weather = WeatherService.update(city, update_data)
-        return UpdateWeather(weather=weather) if weather else None
+        return ws.update(city, update.__dict__)
 
+    @strawberry.mutation
+    def delete_weather(self, info: strawberry.Info, city: str) -> bool:
+        session = info.context["session"]
+        ws = WeatherService(session)
 
-class DeleteWeather(graphene.Mutation):
-    class Arguments:
-        city = graphene.String()
-
-    ok = graphene.Boolean()
-
-    def mutate(self, info, city):
         logger.info(f"Deleting weather data for city: {city}")
-        success = WeatherService.delete(city)
-        return DeleteWeather(ok=success)
+        return ws.delete(city)
 
 
-class Mutation(graphene.ObjectType):
-    fetch_and_save_weather = FetchAndSaveWeather.Field()
-    update_weather = UpdateWeather.Field()
-    delete_weather = DeleteWeather.Field()
-
-
-weather_schema = graphene.Schema(query=Query, mutation=Mutation)
+weather_schema = strawberry.Schema(query=Query, mutation=Mutation)

@@ -1,15 +1,10 @@
 import logging
-from flask import Flask
-from weather.database import db, init_db
-from weather.weather_handler import blueprint as weather_bp
+import uvicorn
+from fastapi import FastAPI
+from fastapi.responses import PlainTextResponse
 
-
-app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///weather.db"
-db.init_app(app)
-init_db(app)
-
-app.register_blueprint(weather_bp, url_prefix="/weather")
+from src.database import create_db_and_tables
+from src.weather_handler import router as weather_router
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -17,10 +12,21 @@ logging.basicConfig(
 )
 
 
-@app.route("/health")
+async def init_db(app: FastAPI):
+    # Do startup tasks
+    create_db_and_tables()
+    yield
+
+
+app = FastAPI(lifespan=init_db)
+app.include_router(weather_router, prefix="/weather")
+
+
+# Health check endpoint
+@app.get("/health", response_class=PlainTextResponse)
 def health():
     return "Service is healthy!"
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="::1", port=5000)
+    uvicorn.run("app:app", host="127.0.0.1", port=5000, reload=False)

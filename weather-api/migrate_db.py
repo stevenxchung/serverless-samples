@@ -1,10 +1,10 @@
-from weather.database import db
+from src.models import Weather  # Required: imports ALL models!
+from src.database import engine
+from sqlmodel import SQLModel
 
-from app import app
-
-with app.app_context():
-    # Recreate the database
-    db.drop_all()
+if __name__ == "__main__":
     print("Dropping old database...")
-    db.create_all()
+    SQLModel.metadata.drop_all(engine)
+    print("Creating new database...")
+    SQLModel.metadata.create_all(engine)
     print("New database initialized!")

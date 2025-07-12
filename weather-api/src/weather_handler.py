@@ -1,14 +1,15 @@
-from flask import Blueprint
-from flask_graphql import GraphQLView
-from weather.weather_schema import weather_schema
+from fastapi import APIRouter, Depends
+from strawberry.fastapi import GraphQLRouter
+from sqlmodel import Session
+from src.database import get_session
+from src.weather_schema import weather_schema
 
-blueprint = Blueprint("weather", __name__)
 
-blueprint.add_url_rule(
-    "/graphql",
-    view_func=GraphQLView.as_view(
-        "graphql",
-        schema=weather_schema,
-        graphiql=True,  # Enables the GraphiQL interface
-    ),
-)
+async def get_context(session: Session = Depends(get_session)):
+    return {"session": session}
+
+
+graphql_router = GraphQLRouter(weather_schema, context_getter=get_context)
+
+router = APIRouter()
+router.include_router(graphql_router, prefix="/graphql")
