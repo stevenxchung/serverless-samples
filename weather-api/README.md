@@ -1,6 +1,6 @@
 # Weather API
 
-A simple Flask API using GraphQL to perform CRUD operations on weather data with an SQLite database.
+A simple [FastAPI](https://github.com/fastapi/fastapi) using GraphQL to perform CRUD operations on weather data with a built-in SQLite database via [SQLModel](https://github.com/fastapi/sqlmodel).
 
 ## Requirements
 
@@ -22,20 +22,11 @@ A simple Flask API using GraphQL to perform CRUD operations on weather data with
    uv sync
    ```
 
-3. **Initialize the database:**
-
-   The database will be created and initialized automatically when you run the application for the first time. However, if you want to manually initialize it, you can run the following script:
-
-   ```python
-   from database import init_db
-   from app import app
-
-   init_db(app)
-   ```
+**Note:** The database `weather.db` will be created and initialized automatically via the `src/database.py` script via SQLModel (SQLAlchemy under the hood) when you run the application for the first time. To reset the database to a clean state: `uv run migrate_db.py`.
 
 ## Running the Application
 
-1. **Start the Flask server:**
+1. **Start the server:**
 
    ```bash
    uv run app.py
@@ -53,17 +44,15 @@ A simple Flask API using GraphQL to perform CRUD operations on weather data with
 
    ```graphql
    mutation ($locationName: String!) {
-     fetchAndSaveWeather(locationName: $locationName) {
-       weather {
-         id
-         city
-         latLong
-         timestamp
-         averageTemp
-         elevation
-         population
-         description
-       }
+     syncWeather(locationName: $locationName) {
+       id
+       city
+       latLong
+       timestamp
+       averageTemp
+       elevation
+       population
+       description
      }
    }
    ```
@@ -80,7 +69,7 @@ A simple Flask API using GraphQL to perform CRUD operations on weather data with
 
    ```graphql
    {
-     weathers {
+     weatherList {
        id
        city
        latLong
@@ -116,17 +105,15 @@ A simple Flask API using GraphQL to perform CRUD operations on weather data with
 
    ```graphql
    mutation ($city: String!, $description: String) {
-     updateWeather(city: $city, description: $description) {
-       weather {
-         id
-         city
-         latLong
-         timestamp
-         averageTemp
-         elevation
-         population
-         description
-       }
+     updateWeather(city: $city, update: { description: $description }) {
+       id
+       city
+       latLong
+       timestamp
+       averageTemp
+       elevation
+       population
+       description
      }
    }
    ```
@@ -146,9 +133,7 @@ A simple Flask API using GraphQL to perform CRUD operations on weather data with
 
    ```graphql
    mutation ($city: String!) {
-     deleteWeather(city: $city) {
-       ok
-     }
+     deleteWeather(city: $city)
    }
    ```
 
