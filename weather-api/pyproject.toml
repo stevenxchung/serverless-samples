@@ -5,11 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "flask>=3.1.1",
-    "flask-graphql>=2.0.1",
-    "flask-sqlalchemy>=3.1.1",
-    "graphene>=2.1.9",
-    "graphene-sqlalchemy>=2.1.0",
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.29.0",
     "requests>=2.32.4",
     "ruff>=0.11.13",
+    "strawberry-graphql[fastapi]>=0.275.5",
+    "sqlmodel>=0.0.24",
 ]
