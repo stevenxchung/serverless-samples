@@ -75,10 +75,10 @@ npm run dev
    }'
    ```
 
-5. **PATCH `/user/:id/activate`:** Activates a user
+5. **PATCH `/user/:id/status`:** Activates a user
 
    ```bash
-   curl --location --request PATCH 'http://localhost:3000/user/1/activate'
+   curl --location --request PATCH 'http://localhost:3000/user/1/status'
    ```
 
 6. **DELETE /user/:id:** Deletes a user

@@ -44,7 +44,7 @@ router.patch("/:id", (req, res) => {
   return userResOutcomes(res, user);
 });
 
-router.patch("/:id/activate", (req, res) => {
+router.patch("/:id/status", (req, res) => {
   const user = userService.activateUser(req.params.id);
   return userResOutcomes(res, user);
 });
