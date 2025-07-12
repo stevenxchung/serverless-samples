@@ -18,7 +18,7 @@ An event-driven, Kafka-based streaming pipeline for ingesting, transforming, and
 
 A REST API for managing user records using TypeScript and AWS services.
 
-- **Tech**: TypeScript, Express, Node.js, bun
+- **Tech**: TypeScript, Express, Node.js, bun, SQLite
 - **Example stack**: API Gateway, AWS Lambda, DynamoDB, RDS
 - **Use case**: User management service with full CRUD
 
@@ -26,11 +26,11 @@ A REST API for managing user records using TypeScript and AWS services.
 
 ### 🌤️ `weather-api`
 
-A GraphQL API that queries and manages weather data via third-party APIs.
+A GraphQL API that queries and manages weather data synced from third-party APIs.
 
-- **Tech**: Python, Flask, GraphQL, uv
+- **Tech**: Python, FastAPI, GraphQL, uv, SQLite
 - **Example stack**: API Gateway, AWS Lambda, DynamoDB, RDS
-- **Use case**: Abstracts and caches weather forecast queries
+- **Use case**: Abstracts and stores weather forecast queries
 
 ➡️ [`weather-api/`](./weather-api)
 
