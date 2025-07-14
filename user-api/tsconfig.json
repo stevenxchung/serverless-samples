@@ -1,12 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "CommonJS",
+    "target": "ES2021",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "rootDir": ".",
     "outDir": "./dist",
     "strict": true,
+    "skipLibCheck": true,
     "esModuleInterop": true,
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
+    "types": ["bun-types"],
     "paths": {
       "@constants/*": ["src/constants/*"],
       "@db/*": ["src/db/*"],
@@ -16,5 +21,6 @@
       "@services/*": ["src/services/*"],
       "@types/*": ["types/*"]
     }
-  }
+  },
+  "include": ["src/**/*.ts", "sqlite/**/*.ts", "types/**/*.ts"]
 }
