@@ -1,4 +1,4 @@
-import { Database } from "better-sqlite3";
+import { Database } from "bun:sqlite";
 import { CreateUserResponse, UpdateUserResponse } from "types/response";
 import { ResponseStatus } from "src/status";
 import { User } from "src/user";
@@ -10,10 +10,10 @@ const toUser = (row: any): User | undefined => {
 export class UserRepository {
   constructor(private db: Database) {}
 
-  getUsers = (limit: Number): User[] => {
+  getUsers = (limit: number): User[] => {
     const rows = this.db
-      .prepare(`SELECT * FROM users LIMIT ${limit}`)
-      .all() as User[];
+      .prepare(`SELECT * FROM users LIMIT ?`)
+      .all(limit) as User[];
     return rows.map(toUser).filter((user): user is User => user !== undefined);
   };
 
@@ -29,14 +29,14 @@ export class UserRepository {
 
     try {
       const stmt = this.db.prepare(`
-            INSERT INTO users 
-            (firstName, lastName, email, address, phone, createdAt, updatedAt)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-          `);
+        INSERT INTO users 
+        (firstName, lastName, email, address, phone, createdAt, updatedAt)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `);
       const result = stmt.run(
-        userData.firstName,
-        userData.lastName,
-        userData.email,
+        userData.firstName ?? null,
+        userData.lastName ?? null,
+        userData.email ?? null,
         userData.address ?? null,
         userData.phone ?? null,
         now,
@@ -46,7 +46,7 @@ export class UserRepository {
       const row = this.getUserById(String(result.lastInsertRowid));
       return { status: ResponseStatus.CREATED, user: toUser(row)! };
     } catch (err: any) {
-      if (err.code.includes("CONSTRAINT_UNIQUE")) {
+      if (err.message.includes("UNIQUE")) {
         return {
           status: ResponseStatus.UNIQUE_CONSTRAINT_FAILED,
           error: "Email and phone must be unique.",
@@ -97,7 +97,7 @@ export class UserRepository {
       const updatedUser = this.getUserById(id)!;
       return { status: ResponseStatus.UPDATED, user: updatedUser };
     } catch (err: any) {
-      if (err.code.includes("CONSTRAINT_UNIQUE")) {
+      if (err.message.includes("UNIQUE")) {
         return {
           status: ResponseStatus.UNIQUE_CONSTRAINT_FAILED,
           error: "Email and phone must be unique.",

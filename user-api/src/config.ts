@@ -1,7 +1,7 @@
-import Database from "better-sqlite3";
+import Database from "bun:sqlite";
 
 const db = new Database("./sqlite/db/users.db");
-db.pragma("journal_mode = WAL");
+db.exec(`PRAGMA journal_mode = WAL;`);
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
