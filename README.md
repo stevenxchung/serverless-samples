@@ -1,6 +1,6 @@
 # Serverless Samples
 
-Collection of backend services and API samples which may serve as a template to help get prototypes and apps started. Consequently, we lean towards serverless builds.
+Collection of backend services and API samples which may serve as a template to help get prototypes and apps started. Consequently, we lean towards managed and [serverless](https://aws.amazon.com/what-is/serverless-computing/) builds to minimize time to ship.
 
 ## Demos
 
