@@ -11,7 +11,7 @@ The pipeline consists of:
 - **Kafka Broker:** Kafka image, running in KRaft mode (no Zookeeper required)
 - **Redis:** Redis image, stores key-value pairs and request count by ID
 
-This setup is ideal for learning, prototyping, or testing event-driven architectures and microservices communication patterns.
+This setup is ideal for learning, prototyping, or testing event-driven architectures and distributed microservice communication patterns.
 
 ## Architecture
 
@@ -19,7 +19,7 @@ This setup is ideal for learning, prototyping, or testing event-driven architect
 [REST Client] ---> [Producer API] ---> [Kafka Topic] ---> [Consumer] ---> [Redis]
 ```
 
-- The **Producer** exposes REST endpoints (`/message` and `/message/bulk/:n`) to accept messages and publish them to Kafka
+- The **Producer** exposes REST endpoints (`/message` and `/message/bulk`) to accept messages and publish them to Kafka
 - The **Consumer** subscribes to the Kafka topic, processes each message, and commits the offset to prevent reprocessing
 - Kafka ensures reliable real-time delivery and decoupling between producer and consumer
 - Redis to store latest key-value pairs and tracks number of requests made by each client via [sorted sets](https://redis.io/docs/latest/develop/data-types/sorted-sets/)
@@ -48,13 +48,13 @@ This setup is ideal for learning, prototyping, or testing event-driven architect
    make up # subsequent runs may use `make start`
    ```
 
-2. **Send a message to the producer:**
+2. **Send a message via the producer:**
 
    ```sh
    curl -X POST http://localhost:3000/producer-api/message -H "Content-Type: application/json" -d "{\"key\":\"test123\", \"value\":\"Hello Kafka!\"}"
    ```
 
-3. **(Optional) send N messages to the producer:**
+3. **(Optional) send N messages via the producer:**
 
    ```sh
    curl -X POST http://localhost:3000/producer-api/message/bulk?n=10000
