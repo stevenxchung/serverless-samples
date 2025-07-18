@@ -8,8 +8,8 @@ Collection of backend services and API samples which may serve as a template to 
 
 An event-driven, Kafka-based streaming pipeline for ingesting, transforming, and storing real-time data.
 
-- **Tech**: Kafka, TypeScript, Node.js, bun, Docker
-- **Example stack**: MSK (Kafka), AWS Lambda, S3
+- **Tech**: Kafka, Redis, TypeScript, Node.js, bun, Docker
+- **Example stack**: MSK (Kafka), AWS Lambda, Redis, DynamoDB, S3
 - **Use case**: Real-time data enrichment and persistence
 
 ➡️ [`streaming-pipeline/`](./streaming-pipeline)
