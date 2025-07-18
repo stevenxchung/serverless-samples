@@ -1,7 +1,7 @@
 import type { Batch, KafkaMessage } from "kafkajs";
 import pino from "pino";
 
-const logger = pino({
+export const logger = pino({
   transport: {
     target: "pino-pretty",
     options: { colorize: true },

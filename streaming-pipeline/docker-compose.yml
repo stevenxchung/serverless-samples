@@ -36,33 +36,61 @@ services:
       "
     restart: "no"
 
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
   producer:
-    build: ./producer
-    volumes:
-      - ./producer:/app # makes local code live inside the container (may not work on WSL)
+    build:
+      context: .
+      dockerfile: producer/Dockerfile
+    # volumes:
+    #   - ./producer:/app # makes local code live inside the container (may not work on WSL)
     ports:
       - 3000:3000 # container:3000 to host:3000
     depends_on:
       - init-kafka-topic
+      - redis
     environment:
       - MAX_BATCH_SIZE=10000
       - KAFKA_BROKER=kafka:9092
       - KAFKA_TOPIC=demo-topic
       - CLIENT_ID=demo-producer
       - PORT=3000
-    command: ["bun", "--hot", "index.ts"] # hot reload on code change (may not work on WSL)
+    command: [
+        "./wait-for-it.sh",
+        "redis:6379",
+        "--",
+        "bun",
+        "--hot",
+        "index.ts",
+      ] # hot reload on code change (may not work on WSL)
     restart: unless-stopped
 
   consumer:
-    build: ./consumer
-    volumes:
-      - ./consumer:/app
+    build:
+      context: .
+      dockerfile: consumer/Dockerfile
+    # volumes:
+    #   - ./consumer:/app
+    ports:
+      - 3001:3001
     depends_on:
       - init-kafka-topic
+      - redis
     environment:
       - KAFKA_BROKER=kafka:9092
       - KAFKA_TOPIC=demo-topic
       - CLIENT_ID=demo-consumer
-      - PORT=3000
-    command: ["bun", "--hot", "index.ts"]
+      - REDIS_URL=redis://redis:6379
+      - PORT=3001
+    command:
+      ["./wait-for-it.sh", "redis:6379", "--", "bun", "--hot", "index.ts"]
     restart: unless-stopped
