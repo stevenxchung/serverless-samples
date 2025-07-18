@@ -1,13 +1,13 @@
 # Streaming Pipeline
 
-This repository demonstrates a real-time event streaming pipeline using **Kafka**, **Bun**, and **Docker Compose**. It includes a producer service, a consumer service, and a Kafka broker, all orchestrated with Docker Compose for easy local development and testing.
+This repository demonstrates a real-time event streaming pipeline using Kafka. It includes a producer service, a consumer service, a Kafka broker, and Redis as the data sync all orchestrated with Docker Compose for rapid local development and testing.
 
 ## Overview
 
 The pipeline consists of:
 
-- **Producer:** A Bun-based REST API that allows you to send messages to a Kafka topic via HTTP requests
-- **Consumer:** A Bun-based service that listens to the Kafka topic, processes incoming messages, writes to Redis, and commits the offset
+- **Producer:** REST API that allows you to send messages to a Kafka topic via HTTP requests
+- **Consumer:** Service that listens to the Kafka topic, processes incoming messages, writes to Redis, and commits the offset
 - **Kafka Broker:** Kafka image, running in KRaft mode (no Zookeeper required)
 - **Redis:** Redis image, stores key-value pairs and request count by ID
 
